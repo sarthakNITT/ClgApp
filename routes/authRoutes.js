@@ -32,14 +32,14 @@ router.post('/register', async (req, res) => {
 
 // Login route
 router.post('/login', async (req, res) => {
-  const { phoneNumber, password } = req.body;
+  const { rollNumber, password } = req.body;
 
-  if (!phoneNumber || !password) {
+  if (!rollNumber || !password) {
     return res.status(400).json({ error: 'Phone number and password are required' });
   }
 
   try {
-    const user = await User.findOne({ phoneNumber });
+    const user = await User.findOne({ rollNumber });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

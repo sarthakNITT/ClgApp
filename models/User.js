@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-  phoneNumber: { type: String, required: true, unique: true },
+  phoneNumber: { type: Number, required: true, unique: true },
   password: { type: String, required: true },
-  rollNumber: { type: String, required: true },
+  rollNumber: { type: String, required: true, unique: true },
   branch: { type: String, required: true },
-  batch: { type: String, required: true },
+  batch: { type: Number, required: true },
 });
 
 // Hash password before saving

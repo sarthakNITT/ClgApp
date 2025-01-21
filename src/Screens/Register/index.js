@@ -66,13 +66,13 @@ const RegisterScreen = () => {
 
     const rollNumberRegex = /^\d{9}$/;
     if (!rollNumberRegex.test(rollNumber)) {
-      Alert.alert('Error', 'Roll Number must be exactly 9 digits');
+      Alert.alert('Error', 'Incorrect Roll Number');
       return;
     }
 
     const phoneNumberRegex = /^\d{10}$/;
     if (!phoneNumberRegex.test(phoneNumber)) {
-      Alert.alert('Error', 'Phone Number must be exactly 10 digits');
+      Alert.alert('Error', 'Incorrect Phone Number');
       return;
     }
 

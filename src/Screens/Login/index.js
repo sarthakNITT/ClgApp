@@ -15,12 +15,19 @@ const LoginScreen = () => {
   const handleInputChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
+  
 
   const handleLogin = async () => {
     const { rollNumber, password } = formData;
 
     if (!rollNumber || !password) {
       Alert.alert('Error', 'Roll number and password are required');
+      return;
+    }
+
+    const rollNumberRegex = /^\d{9}$/;
+    if (!rollNumberRegex.test(rollNumber)) {
+      Alert.alert('Error', 'Incorrect Roll Number');
       return;
     }
 
@@ -90,7 +97,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 70 : 10,
+    paddingTop: Platform.OS === 'ios' ? 80 : 30,
   },
   title: {
     fontSize: 24,

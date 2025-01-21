@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, Platform } from 'react-native';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const [formData, setFormData] = useState({
     rollNumber: '',
     password: '',
@@ -23,7 +25,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3001/api/auth/login', {
+      const response = await axios.post(Platform.OS === 'ios' ? 'http://localhost:3001/api/auth/login' : 'http://<your-local-IP>:3001/api/auth/login', {
         rollNumber,
         password,
       });
@@ -69,7 +71,7 @@ const LoginScreen = () => {
       </View>
 
       {/* Register Option at the Bottom */}
-      <TouchableOpacity style={styles.Account}>
+      <TouchableOpacity style={styles.Account} onPress={() => navigation.navigate('RegisterScreen')}>
         <Text style={styles.AccountLogin}>I don't have an account</Text>
       </TouchableOpacity>
     </View>

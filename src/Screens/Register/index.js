@@ -9,15 +9,26 @@ import {
   Alert,
   Modal,
   FlatList,
+  Platform,
 } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-const branches = ['Production Engineering', 'Computer Science Engineering', 'Chemical Engineering', 'Material Science and Metallurgy Engineering', 'Mechanical Engineering', 'Electrical and Electronics Engineering', 'Civil Engineering', 'Electronics and Communication Engineering', 'Instrumentation and Control Engineering'];
+const branches = [
+  'Production Engineering',
+  'Computer Science Engineering',
+  'Chemical Engineering',
+  'Material Science and Metallurgy Engineering',
+  'Mechanical Engineering',
+  'Electrical and Electronics Engineering',
+  'Civil Engineering',
+  'Electronics and Communication Engineering',
+  'Instrumentation and Control Engineering',
+];
 
-const Batches = ['2028', '2027' ]
+const batches = ['2028', '2027'];
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -53,7 +64,7 @@ const RegisterScreen = () => {
       return;
     }
 
-    const rollNumberRegex = /^\d{9}$/; // Regex to check if it's exactly 9 digits
+    const rollNumberRegex = /^\d{9}$/;
     if (!rollNumberRegex.test(rollNumber)) {
       Alert.alert('Error', 'Roll Number must be exactly 9 digits');
       return;
@@ -67,7 +78,9 @@ const RegisterScreen = () => {
 
     try {
       const response = await axios.post(
-        Platform.OS === 'ios' ? 'http://localhost:3001/api/auth/register' : 'http://<your-local-IP>:3001/api/auth/register',
+        Platform.OS === 'ios' 
+          ? 'http://localhost:3001/api/auth/register' 
+          : 'http://<your-local-IP>:3001/api/auth/register',
         {
           phoneNumber,
           password,
@@ -80,12 +93,11 @@ const RegisterScreen = () => {
       Alert.alert('Success', response.data.message, [
         {
           text: 'OK',
-          onPress: () => navigation.navigate('Login'), // Navigate to Login screen
+          onPress: () => navigation.navigate('Login'),
         },
       ]);
     } catch (error) {
       if (error.response) {
-        // Backend error messages
         Alert.alert('Error', error.response.data.error);
       } else {
         Alert.alert('Error', 'An unexpected error occurred');
@@ -95,7 +107,6 @@ const RegisterScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Registration Form */}
       <View style={styles.formContainer}>
         <Text style={styles.title}>Register</Text>
         <Text style={styles.subtitle}>Welcome! Create your account.</Text>
@@ -139,21 +150,12 @@ const RegisterScreen = () => {
             {formData.batch || 'Select Batch'}
           </Text>
         </TouchableOpacity>
-        {/* <TextInput
-          style={styles.input}
-          placeholder="Batch"
-          placeholderTextColor="#777"
-          keyboardType="numeric"
-          onChangeText={(value) => handleInputChange('batch', value)}
-          value={formData.batch}
-        /> */}
 
         <TouchableOpacity style={styles.nextButton} onPress={handleRegister}>
           <Text style={styles.nextButtonText}>Register</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal for Branch Selection */}
       <Modal
         visible={isBranchModalVisible}
         transparent
@@ -195,7 +197,7 @@ const RegisterScreen = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Batch</Text>
             <FlatList
-              data={Batches}
+              data={batches}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -216,7 +218,6 @@ const RegisterScreen = () => {
         </View>
       </Modal>
 
-      {/* Account Login at the bottom */}
       <TouchableOpacity style={styles.Account} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.AccountLogin}>I already have an account</Text>
       </TouchableOpacity>
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 70 : 10,
+    paddingTop: Platform.OS === 'ios' ? 80 : 30,
   },
   title: {
     fontSize: 24,
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     justifyContent: 'center',
     marginBottom: 15,
+    color: '#fff'
   },
   inputText: {
     color: '#fff',

@@ -39,7 +39,12 @@ const RegisterScreen = () => {
         batch,
       });
 
-      Alert.alert('Success', response.data.message);
+      Alert.alert('Success', response.data.message, [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('Login'), // Navigate to Login screen
+        },
+      ]);
     } catch (error) {
       if (error.response) {
         // Backend error messages
@@ -104,7 +109,7 @@ const RegisterScreen = () => {
       </View>
 
       {/* Account Login at the bottom */}
-      <TouchableOpacity style={styles.Account} onPress={() => navigation.navigate('LoginScreen')}>
+      <TouchableOpacity style={styles.Account} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.AccountLogin}>I already have an account</Text>
       </TouchableOpacity>
     </View>

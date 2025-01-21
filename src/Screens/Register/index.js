@@ -1,9 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Alert,
+  Modal,
+  FlatList,
+} from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
+
+const branches = ['Production Engineering', 'Computer Science Engineering', 'Chemical Engineering', 'Material Science and Metallurgy Engineering', 'Mechanical Engineering', 'Electrical and Electronics Engineering', 'Civil Engineering', 'Electronics and Communication Engineering', 'Instrumentation and Control Engineering'];
+
+const Batches = ['2028', '2027' ]
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -14,9 +28,21 @@ const RegisterScreen = () => {
     branch: '',
     batch: '',
   });
+  const [isBranchModalVisible, setBranchModalVisible] = useState(false);
+  const [isBatchModalVisible, setBatchModalVisible] = useState(false);
 
   const handleInputChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
+  };
+
+  const handleBranchSelect = (branch) => {
+    setFormData({ ...formData, branch });
+    setBranchModalVisible(false);
+  };
+
+  const handleBatchSelect = (batch) => {
+    setFormData({ ...formData, batch });
+    setBatchModalVisible(false);
   };
 
   const handleRegister = async () => {
@@ -27,17 +53,29 @@ const RegisterScreen = () => {
       return;
     }
 
+    const rollNumberRegex = /^\d{9}$/; // Regex to check if it's exactly 9 digits
+    if (!rollNumberRegex.test(rollNumber)) {
+      Alert.alert('Error', 'Roll Number must be exactly 9 digits');
+      return;
+    }
+
+    const phoneNumberRegex = /^\d{10}$/;
+    if (!phoneNumberRegex.test(phoneNumber)) {
+      Alert.alert('Error', 'Phone Number must be exactly 10 digits');
+      return;
+    }
+
     try {
-      // for android-emulator http://10.0.2.2:5000/api/auth/register
-      // for ios-emulator http://localhost:5000/api/auth/register
-      // for physical device http://<your-local-IP>:5000/api/auth/register
-      const response = await axios.post(Platform.OS === 'ios' ? 'http://localhost:3001/api/auth/register' : 'http://<your-local-IP>:3001/api/auth/register', {
-        phoneNumber,
-        password,
-        rollNumber,
-        branch,
-        batch,
-      });
+      const response = await axios.post(
+        Platform.OS === 'ios' ? 'http://localhost:3001/api/auth/register' : 'http://<your-local-IP>:3001/api/auth/register',
+        {
+          phoneNumber,
+          password,
+          rollNumber,
+          branch,
+          batch,
+        }
+      );
 
       Alert.alert('Success', response.data.message, [
         {
@@ -85,28 +123,98 @@ const RegisterScreen = () => {
           onChangeText={(value) => handleInputChange('rollNumber', value)}
           value={formData.rollNumber}
         />
-        <View style={styles.inputBox}>
-          <TextInput
-            style={styles.inputBoxElement}
-            placeholder="Branch"
-            placeholderTextColor="#777"
-            onChangeText={(value) => handleInputChange('branch', value)}
-            value={formData.branch}
-          />
-          <TextInput
-            style={styles.inputBoxElement}
-            placeholder="Batch"
-            placeholderTextColor="#777"
-            keyboardType="numeric"
-            onChangeText={(value) => handleInputChange('batch', value)}
-            value={formData.batch}
-          />
-        </View>
+        <TouchableOpacity
+          style={styles.input}
+          onPress={() => setBranchModalVisible(true)}
+        >
+          <Text style={formData.branch ? styles.inputText : styles.placeholderText}>
+            {formData.branch || 'Select Branch'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.input}
+          onPress={() => setBatchModalVisible(true)}
+        >
+          <Text style={formData.batch ? styles.inputText : styles.placeholderText}>
+            {formData.batch || 'Select Batch'}
+          </Text>
+        </TouchableOpacity>
+        {/* <TextInput
+          style={styles.input}
+          placeholder="Batch"
+          placeholderTextColor="#777"
+          keyboardType="numeric"
+          onChangeText={(value) => handleInputChange('batch', value)}
+          value={formData.batch}
+        /> */}
 
         <TouchableOpacity style={styles.nextButton} onPress={handleRegister}>
           <Text style={styles.nextButtonText}>Register</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modal for Branch Selection */}
+      <Modal
+        visible={isBranchModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setBranchModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Branch</Text>
+            <FlatList
+              data={branches}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => handleBranchSelect(item)}
+                >
+                  <Text style={styles.modalItemText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setBranchModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isBatchModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setBatchModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Batch</Text>
+            <FlatList
+              data={Batches}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => handleBatchSelect(item)}
+                >
+                  <Text style={styles.modalItemText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setBatchModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Account Login at the bottom */}
       <TouchableOpacity style={styles.Account} onPress={() => navigation.navigate('Login')}>
@@ -147,23 +255,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#222',
     borderRadius: 10,
     paddingHorizontal: 15,
-    color: '#fff',
+    justifyContent: 'center',
     marginBottom: 15,
   },
-  inputBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  inputBoxElement: {
-    width: '48%',
-    height: 50,
-    backgroundColor: '#222',
-    borderRadius: 10,
-    paddingHorizontal: 15,
+  inputText: {
     color: '#fff',
-    marginBottom: 15,
-    marginHorizontal: 7.5
+  },
+  placeholderText: {
+    color: '#777',
   },
   nextButton: {
     backgroundColor: '#4A90E2',
@@ -185,6 +284,44 @@ const styles = StyleSheet.create({
   },
   AccountLogin: {
     color: '#4A90E2',
+    fontSize: 14,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#222',
+    borderRadius: 15,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    color: '#fff',
+    marginBottom: 10,
+  },
+  modalItem: {
+    width: '100%',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#555',
+  },
+  modalItemText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 15,
+    backgroundColor: '#4A90E2',
+    padding: 10,
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    color: '#fff',
     fontSize: 14,
   },
 });
